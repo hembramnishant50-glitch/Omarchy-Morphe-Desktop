@@ -108,6 +108,11 @@ That's it. Morphe appears in your **Omarchy app menu** and as the `morphe` comma
 | **ADB** *(optional)* | `sudo pacman -S android-tools` | Only for `morphe install` to device |
 | **curl** | `sudo pacman -S curl` | For downloading releases |
 
+**Single command to install all requirements:**
+```bash
+sudo pacman -S --needed jdk21-openjdk git android-tools curl
+```
+
 Check before installing:
 ```bash
 java -version      # should be 21+
