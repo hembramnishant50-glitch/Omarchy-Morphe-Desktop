@@ -128,6 +128,34 @@ Voilà! This is your final patched apk. Go ahead, install this apk on your devic
 
 Now head over to the [documentation](/docs/documentation.md)
 
+## Omarchy Integration
+
+Quick install for [Omarchy](https://omarchy.org/) Linux:
+
+```bash
+git clone https://github.com/hembramnishant50-glitch/morphe-desktop.git
+cd morphe-desktop
+./install.sh
+```
+
+### Usage
+
+```bash
+morphe              # Launch GUI
+morphe help         # Show all commands
+morphe patch <apk>  # Patch an APK
+morphe install <apk> # Install via ADB
+morphe update       # Update patches
+```
+
+### Uninstall
+
+```bash
+./uninstall.sh
+```
+
+For more details, see [docs/OMARCHY.md](docs/OMARCHY.md).
+
 [//]: # (## Everything else)
 ## Contributing
 Thank you for considering contributing to Morphe Desktop.
