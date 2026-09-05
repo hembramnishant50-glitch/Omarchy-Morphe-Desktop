@@ -21,7 +21,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/hembramnishant50-glitch/morphe-desktop"><img src="https://img.shields.io/badge/Fork-Omarchy%20Ready-2ea44f?style=for-the-badge" alt="Omarchy Ready"></a>
+  <a href="https://github.com/hembramnishant50-glitch/Omarchy-Morphe-Desktop"><img src="https://img.shields.io/badge/Fork-Omarchy%20Ready-2ea44f?style=for-the-badge" alt="Omarchy Ready"></a>
   <a href="https://github.com/MorpheApp/morphe-desktop"><img src="https://img.shields.io/badge/Upstream-MorpheApp-8A2BE2?style=for-the-badge" alt="Upstream"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=for-the-badge" alt="License"></a>
 </p>
@@ -71,7 +71,7 @@
 
 ```bash
 # 1. Clone
-git clone https://github.com/hembramnishant50-glitch/morphe-desktop.git
+git clone https://github.com/hembramnishant50-glitch/Omarchy-Morphe-Desktop.git
 cd morphe-desktop
 
 # 2. Install (downloads latest JAR + patches, sets up CLI + app menu)
@@ -121,7 +121,7 @@ adb version        # optional
 ### Option A — Automatic (Recommended)
 
 ```bash
-git clone https://github.com/hembramnishant50-glitch/morphe-desktop.git
+git clone https://github.com/hembramnishant50-glitch/Omarchy-Morphe-Desktop.git
 cd morphe-desktop
 chmod +x install.sh
 ./install.sh
