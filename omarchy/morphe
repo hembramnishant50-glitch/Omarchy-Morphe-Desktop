@@ -1,0 +1,235 @@
+#!/bin/bash
+# Morphe Desktop - Easy run wrapper for Omarchy
+# This script makes it easy to run Morphe Desktop from anywhere
+
+set -e
+
+# Configuration
+MORPHE_HOME="${MORPHE_HOME:-${HOME}/.local/share/morphe-desktop}"
+MORPHE_JAR="${MORPHE_HOME}/morphe-desktop-all.jar"
+PATCHES_DIR="${MORPHE_HOME}/patches"
+DATA_DIR="${MORPHE_HOME}/data"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to print colored output
+print_status() {
+    echo -e "${BLUE}[Morphe]${NC} $1"
+}
+
+print_success() {
+    echo -e "${GREEN}[Morphe]${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[Morphe]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[Morphe]${NC} $1"
+}
+
+# Function to check if Java is available
+check_java() {
+    if ! command -v java &> /dev/null; then
+        print_error "Java is not installed or not in PATH"
+        print_warning "Please install Java 21 or later:"
+        print_warning "  sudo pacman -S jdk21-openjdk"
+        print_warning "  or visit: https://adoptium.net/temurin/releases/?version=21"
+        exit 1
+    fi
+    
+    # Check Java version
+    JAVA_VERSION=$(java -version 2>&1 | head -n 1 | cut -d'"' -f2 | cut -d'.' -f1)
+    if [ "$JAVA_VERSION" -lt 21 ]; then
+        print_error "Java 21 or later is required (found Java $JAVA_VERSION)"
+        print_warning "Please install Java 21 or later:"
+        print_warning "  sudo pacman -S jdk21-openjdk"
+        exit 1
+    fi
+}
+
+# Function to check if Morphe JAR exists
+check_morphe() {
+    if [ ! -f "$MORPHE_JAR" ]; then
+        print_error "Morphe Desktop JAR not found at: $MORPHE_JAR"
+        print_warning "Please run the installation script first:"
+        print_warning "  ./install-omarchy.sh"
+        exit 1
+    fi
+}
+
+# Function to create data directory
+ensure_data_dir() {
+    if [ ! -d "$DATA_DIR" ]; then
+        mkdir -p "$DATA_DIR"
+        print_status "Created data directory: $DATA_DIR"
+    fi
+}
+
+# Function to run Morphe in GUI mode
+run_gui() {
+    print_status "Starting Morphe Desktop GUI..."
+    java -jar "$MORPHE_JAR" "$@"
+}
+
+# Function to run Morphe in CLI mode
+run_cli() {
+    print_status "Running Morphe Desktop CLI..."
+    java -jar "$MORPHE_JAR" "$@"
+}
+
+# Function to patch an APK
+patch_apk() {
+    local apk_file="$1"
+    local patches_file="$2"
+    local output_dir="${3:-.}"
+    
+    if [ -z "$apk_file" ]; then
+        print_error "Usage: morphe patch <apk-file> [patches-file] [output-dir]"
+        exit 1
+    fi
+    
+    if [ ! -f "$apk_file" ]; then
+        print_error "APK file not found: $apk_file"
+        exit 1
+    fi
+    
+    # Use default patches if not specified
+    if [ -z "$patches_file" ]; then
+        patches_file=$(find "$PATCHES_DIR" -name "*.mpp" -type f | head -1)
+        if [ -z "$patches_file" ]; then
+            print_error "No patches file found in $PATCHES_DIR"
+            print_warning "Download patches from: https://github.com/MorpheApp/morphe-patches/releases/latest"
+            exit 1
+        fi
+    fi
+    
+    if [ ! -f "$patches_file" ]; then
+        print_error "Patches file not found: $patches_file"
+        exit 1
+    fi
+    
+    print_status "Patching $apk_file..."
+    print_status "Using patches: $patches_file"
+    
+    java -jar "$MORPHE_JAR" patch -p "$patches_file" "$apk_file" -o "$output_dir"
+    
+    print_success "Patching complete!"
+}
+
+# Function to install APK via ADB
+install_apk() {
+    local apk_file="$1"
+    
+    if [ -z "$apk_file" ]; then
+        print_error "Usage: morphe install <apk-file>"
+        exit 1
+    fi
+    
+    if [ ! -f "$apk_file" ]; then
+        print_error "APK file not found: $apk_file"
+        exit 1
+    fi
+    
+    if ! command -v adb &> /dev/null; then
+        print_error "ADB is not installed or not in PATH"
+        print_warning "Please install ADB:"
+        print_warning "  sudo pacman -S android-tools"
+        exit 1
+    fi
+    
+    print_status "Installing $apk_file via ADB..."
+    adb install "$apk_file"
+    
+    print_success "Installation complete!"
+}
+
+# Function to show help
+show_help() {
+    echo -e "${BLUE}Morphe Desktop - Android App Patcher${NC}"
+    echo ""
+    echo "Usage: morphe [command] [options]"
+    echo ""
+    echo "Commands:"
+    echo "  gui [args]           Start Morphe Desktop GUI (default)"
+    echo "  cli [args]           Run Morphe Desktop CLI"
+    echo "  patch <apk> [patches] [output]  Patch an APK file"
+    echo "  install <apk>        Install patched APK via ADB"
+    echo "  update               Update Morphe Desktop"
+    echo "  help                 Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  morphe                    # Start GUI"
+    echo "  morphe gui                # Start GUI"
+    echo "  morphe patch youtube.apk  # Patch YouTube APK"
+    echo "  morphe install youtube-patched.apk  # Install patched APK"
+    echo ""
+    echo "Configuration:"
+    echo "  MORPHE_HOME: Installation directory (default: /opt/morphe-desktop)"
+    echo "  Data directory: $DATA_DIR"
+}
+
+# Function to update Morphe Desktop
+update_morphe() {
+    print_status "Updating Morphe Desktop..."
+    
+    if [ -f "${MORPHE_HOME}/update.sh" ]; then
+        "${MORPHE_HOME}/update.sh"
+    else
+        print_error "Update script not found"
+        print_warning "Please reinstall Morphe Desktop"
+        exit 1
+    fi
+}
+
+# Main script
+main() {
+    # Check prerequisites
+    check_java
+    check_morphe
+    ensure_data_dir
+    
+    # Parse command
+    case "${1:-gui}" in
+        gui)
+            shift
+            run_gui "$@"
+            ;;
+        cli)
+            shift
+            run_cli "$@"
+            ;;
+        patch)
+            shift
+            patch_apk "$@"
+            ;;
+        install)
+            shift
+            install_apk "$@"
+            ;;
+        update)
+            update_morphe
+            ;;
+        help|--help|-h)
+            show_help
+            ;;
+        *)
+            # Check if it's a file (for drag-and-drop)
+            if [ -f "$1" ]; then
+                run_gui "$@"
+            else
+                print_error "Unknown command: $1"
+                show_help
+                exit 1
+            fi
+            ;;
+    esac
+}
+
+main "$@"

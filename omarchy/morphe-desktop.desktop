@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Morphe Desktop
+Comment=Android app patching tool
+Exec=/opt/morphe-desktop/morphe %U
+Icon=morphe-desktop
+Terminal=false
+Type=Application
+Categories=Development;Utility;
+MimeType=application/vnd.android.package-archive;application/vnd.android.package-apkm;application/vnd.android.package-xapk;application/vnd.android.package-apks;
+Keywords=android;patch;apk;revanced;
+StartupWMClass=app.morphe.MorpheLauncherKt
