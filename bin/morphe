@@ -76,6 +76,7 @@ cmd_help() {
     echo "  patch <apk> [p] [o] Patch APK (patches & output optional)"
     echo "  install <apk>      Install APK via ADB"
     echo "  update             Update patches"
+    echo "  uninstall          Uninstall Morphe"
     echo "  help               Show this help"
     echo "  version            Show version"
     echo ""
@@ -93,18 +94,36 @@ cmd_version() {
     [ -f "$MORPHE_JAR" ] && java -jar "$MORPHE_JAR" --version 2>/dev/null || echo "Not installed"
 }
 
+cmd_uninstall() {
+    echo -e "${BLUE}━━━ Morphe Uninstaller ━━━${NC}"
+    read -p "Remove Morphe Desktop? [y/N] " -r ans
+    [[ "$ans" =~ ^[Yy]$ ]] || { info "Cancelled"; exit 0; }
+    rm -f "${HOME}/.local/bin/morphe"
+    rm -f "${HOME}/.local/share/applications/morphe-desktop.desktop"
+    rm -f "${HOME}/.local/share/icons/morphe-desktop.png"
+    rm -rf "${MORPHE_HOME}"
+    ok "Uninstalled"
+    # self-delete if invoked as installed binary — warn
+    echo "Run: rm -rf ~/Projects/morphe-desktop  # to remove source clone (optional)"
+}
+
 # --- main ---
+case "${1:-gui}" in
+    help|-h|--help) cmd_help; exit 0 ;;
+    version)        cmd_version; exit 0 ;;
+    uninstall)      cmd_uninstall; exit 0 ;;
+esac
+
 check_java
 check_jar
 
 case "${1:-gui}" in
-    gui)      shift; cmd_gui "$@" ;;
-    cli)      shift; cmd_cli "$@" ;;
-    patch)    shift; cmd_patch "$@" ;;
-    install)  shift; cmd_install "$@" ;;
-    update)   cmd_update ;;
-    version)  cmd_version ;;
+    gui)       shift; cmd_gui "$@" ;;
+    cli)       shift; cmd_cli "$@" ;;
+    patch)     shift; cmd_patch "$@" ;;
+    install)   shift; cmd_install "$@" ;;
+    update)    cmd_update ;;
+    version)   cmd_version ;;
     help|-h|--help) cmd_help ;;
-    *)        # If it's a file, open in GUI; else error
-              [ -f "$1" ] && cmd_gui "$@" || { err "Unknown command: $1"; cmd_help; exit 1; } ;;
+    *)         [ -f "$1" ] && cmd_gui "$@" || { err "Unknown command: $1"; cmd_help; exit 1; } ;;
 esac

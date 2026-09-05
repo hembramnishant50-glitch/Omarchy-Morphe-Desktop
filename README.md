@@ -220,6 +220,7 @@ adb install youtube-patched.apk
 | `morphe patch <apk> [patches] [out]` | Patch APK |
 | `morphe install <apk>` | Install via ADB |
 | `morphe update` | Update patches to latest |
+| `morphe uninstall` | Uninstall from anywhere |
 | `morphe version` | Show version |
 | `morphe help` | Show help |
 
@@ -314,24 +315,37 @@ git pull
 morphe update
 ```
 
-### Uninstall
+### Uninstall — 3 Ways (all work from anywhere)
 
+**Way 1 — Recommended (works from any folder, no clone needed):**
 ```bash
+morphe uninstall
+# → asks [y/N], removes:
+#   ~/.local/bin/morphe
+#   ~/.local/share/applications/morphe-desktop.desktop
+#   ~/.local/share/icons/morphe-desktop.png
+#   ~/.local/share/morphe-desktop/
+```
+
+**Way 2 — From clone:**
+```bash
+cd ~/Projects/morphe-desktop
 ./uninstall.sh
-# Removes:
-#  - ~/.local/bin/morphe
-#  - ~/.local/share/applications/morphe-desktop.desktop
-#  - ~/.local/share/icons/morphe-desktop.png
-#  - ~/.local/share/morphe-desktop/
+# or
+~/Projects/morphe-desktop/uninstall.sh
 ```
 
-Or manually:
+**Way 3 — Manual (if `morphe` is already deleted):**
 ```bash
-rm ~/.local/bin/morphe
-rm ~/.local/share/applications/morphe-desktop.desktop
-rm ~/.local/share/icons/morphe-desktop.png
+rm -f ~/.local/bin/morphe
+rm -f ~/.local/share/applications/morphe-desktop.desktop
+rm -f ~/.local/share/icons/morphe-desktop.png
 rm -rf ~/.local/share/morphe-desktop
+update-desktop-database ~/.local/share/applications/
 ```
+
+> [!NOTE]
+> If you ran `rm ~/.local/bin/morphe` already, `morphe uninstall` won’t work — use Way 2 or 3.
 
 ---
 
